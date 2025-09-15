@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextTravel Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-wrap: wrap;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: #343a40;
+            color: white;
+            padding: 20px;
+            position: fixed;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .sidebar a:hover {
+            background: #495057;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            margin-left: 250px;
+            transition: margin-left 0.3s ease;
+        }
+        .hidden {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            .content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar d-flex flex-column p-3">
+    <h2 class="text-center">NextTravel Admin</h2>
+    <a onclick="showPanel('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a onclick="showPanel('users')"><i class="fas fa-users"></i> Users</a>
+    <a onclick="showPanel('vehicles')"><i class="fas fa-car"></i> Vehicles</a>
+    <a onclick="showPanel('destinations')"><i class="fas fa-route"></i> Destinations</a>
+    <a onclick="showPanel('guides')"><i class="fas fa-route"></i> Guides</a>
+    <a onclick="showPanel('bookings')"><i class="fas fa-book"></i> Bookings</a>
+    <a onclick="showPanel('packages')"><i class="fas fa-box"></i> Packages</a>
+    <a onclick="showPanel('payments')"><i class="fas fa-credit-card"></i> Payments</a>
+   <!-- <a onclick="showPanel('settings')"><i class="fas fa-cog"></i> Settings</a>-->
+
+    <div class="mt-auto text-left">
+        <h3>Hi, <span class="font-weight-bold">admin</span></h3>
+        <button id="logoutBtn" class="btn btn-danger btn-block dropdown-item text-danger" onclick="logout()">Log Out</button>
+    </div>
+
+</div>
+<div class="content">
+
+    <div class="container mt-5" id="dashboard">
+        <h2 class="mb-4">Welcome to NextTravel Dashboard</h2>
+        <div class="row g-4">
+
+            <!-- Total Bookings -->
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 bg-light h-100">
+                    <div class="card-body d-flex align-items-center">
+                        <i class="bi bi-calendar-check fs-1 text-primary me-3"></i>
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">Total Bookings</h6>
+                            <h4 class="card-title mb-0" id="totalBookings">0</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Vehicles -->
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 bg-light h-100">
+                    <div class="card-body d-flex align-items-center">
+                        <i class="bi bi-truck-front fs-1 text-info me-3"></i>
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">Total Vehicles</h6>
+                            <h4 class="card-title mb-0" id="totalVehicles">0</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Guides -->
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 bg-light h-100">
+                    <div class="card-body d-flex align-items-center">
+                        <i class="bi bi-person-vcard fs-1 text-secondary me-3"></i>
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">Total Guides</h6>
+                            <h4 class="card-title mb-0" id="totalGuides">0</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+            <div class="container mt-5">
+                <div class="row">
+                    <!-- Bookings Per Day -->
+                    <div class="col-md-6">
+                        <div class="card shadow p-3 mb-5 bg-white rounded">
+                            <h5 class="text-center">Bookings Per Day</h5>
+                            <canvas id="bookingsPerDayChart" height="450"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Total Price Per Booking -->
+                    <div class="col-md-6">
+                        <div class="card shadow p-3 mb-5 bg-white rounded">
+                            <h5 class="text-center">Total Price Per Booking</h5>
+                            <canvas id="totalPricePerBookingChart" height="450"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                $(document).ready(function () {
+                    loadBookingsPerDayChart();
+                    loadTotalPricePerBookingChart();
+                });
+
+                function loadBookingsPerDayChart() {
+                    $.ajax({
+                        url: "http://localhost:8080/api/v1/dashboard/chart/bookings-per-day",
+                        method: "GET",
+                        success: function (res) {
+                            const labels = res.data.map(item => item.date);
+                            const data = res.data.map(item => item.count);
+
+                            new Chart(document.getElementById('bookingsPerDayChart'), {
+                                type: 'bar',
+                                data: {
+                                    labels: labels,
+                                    datasets: [{
+                                        label: 'Bookings Per Day',
+                                        data: data,
+                                        backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                                    }]
+                                }
+                            });
+                        }
+                    });
+                }
+
+                function loadTotalPricePerBookingChart() {
+                    $.ajax({
+                        url: "http://localhost:8080/api/v1/dashboard/chart/total-price-per-booking",
+                        method: "GET",
+                        success: function (res) {
+                            const labels = res.data.map(item => "Booking " + item.bookingId);
+                            const data = res.data.map(item => item.total);
+
+                            new Chart(document.getElementById('totalPricePerBookingChart'), {
+                                type: 'line',
+                                data: {
+                                    labels: labels,
+                                    datasets: [{
+                                        label: 'Total Price Per Booking',
+                                        data: data,
+                                        fill: false,
+                                        borderColor: 'rgba(255, 99, 132, 0.8)',
+                                        tension: 0.1
+                                    }]
+                                }
+                            });
+                        }
+                    });
+                }
+            </script>
+            <script>
+                $(document).ready(function () {
+                    loadDashboardCounts();
+                });
+
+                function loadDashboardCounts() {
+                    $.ajax({
+                        url: "http://localhost:8080/api/v1/dashboard/counts",
+                        method: "GET",
+                        success: function (response) {
+                            $('#totalBookings').text(response.data.totalBookings);
+                            $('#totalVehicles').text(response.data.totalVehicles);
+                            $('#totalGuides').text(response.data.totalGuides);
+                        },
+                        error: function () {
+                            alert("Failed to load dashboard data.");
+                        }
+                    });
+                }
+            </script>
+
+        </div>
+    </div>
+
+    <div id="vehicles" class="hidden">
+        <h1>Vehicle Management</h1>
+        <table class="table table-bordered mt-3">
+            <thead class="table-dark">
+            <tr>
+                <th>Vehicle No.</th>
+                <th>Type</th>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Year</th>
+                <th>Color</th>
+                <th>Seats</th>
+                <th>Fuel Type</th>
+                <th>Booked</th>
+                <th>Insurance</th>
+                <th>Registration Doc.</th>
+                <th>Vehicles Images</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="vehicleTableBody"></tbody>
+        </table>
+
+    </div>
+
+    <div id="users" class="hidden">
+        <h1>User Management</h1>
+        <!-- Search Bar -->
+        <div class="d-flex justify-content-end mb-3">
+            <input type="text" id="searchInput" class="form-control w-50" placeholder="Search by Name or Email" onkeyup="searchUsers()">
+        </div>
+        <table class="table table-bordered mt-3">
+            <thead class="table-dark">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+        </table>
+        <script>
+            // Load all users when page is ready
+            $(document).ready(function () {
+                loadAllUsers();
+            });
+
+            // Function to load users via AJAX
+            function loadAllUsers() {
+                $.ajax({
+                    url: "http://localhost:8080/api/v1/user/getAll",
+                    method: "GET",
+                    success: function (users) {
+                        $("#userTableBody").empty();
+                        window.allUsers = users.data;  // Store all users in a global variable for search
+                        renderTable(users.data);  // Render the table initially with all users
+                    },
+                    error: function (xhr) {
+                        console.error("Error fetching users:", xhr.responseText);
+                        alert("Failed to load users.");
+                    }
+                });
+            }
+
+            // Function to render the user table
+            function renderTable(users) {
+                $("#userTableBody").empty(); // Clear the table body
+                users.forEach(user => {
+                    $("#userTableBody").append(`
+            <tr>
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td>${user.role}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.email}')">Delete</button>
+                </td>
+            </tr>
+        `);
+                });
+            }
+
+            // Function to filter users based on the search input
+            function searchUsers() {
+                const searchTerm = $("#searchInput").val().toLowerCase();  // Get the search input value
+                const filteredUsers = window.allUsers.filter(user => {
+                    return user.name.toLowerCase().includes(searchTerm) || user.email.toLowerCase().includes(searchTerm);
+                });
+                renderTable(filteredUsers);  // Re-render the table with the filtered users
+            }
+
+            // Function to delete user
+            function deleteUser(email) {
+                console.log("Attempting to delete user with email:", email); // Debug log
+                if (confirm("Are you sure you want to delete this user?")) {
+                    $.ajax({
+                        url: `http://localhost:8080/api/v1/user/delete/${email}`,
+                        method: "DELETE",
+                        success: function (response) {
+                            console.log("Delete response:", response);  // Debug log
+                            alert("User deleted successfully.");
+                            loadAllUsers();  // Reload the users after deletion
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error deleting user:", xhr.responseText);  // Debug log
+                            alert("Failed to delete user.");
+                        }
+                    });
+                }
+            }
+
+
+        </script>
+    </div>
+
+    <div id="bookings" class="hidden">
+        <h1>Booking Management</h1>
+        <div class="d-flex justify-content-end mb-3">
+            <input type="text" id="searchBooking" class="form-control w-25" placeholder="Search by Email, Vehicle, Package...">
+        </div>
+        <table class="table table-bordered mt-3">
+            <thead class="table-dark">
+            <tr>
+                <th>Package Name</th>
+                <th>Guide Email</th>
+                <th>Vehicle No</th>
+                <th>User Email</th>
+                <th>Booking Date</th>
+                <th>Checkout Date</th>
+                <th>Estimated days</th>
+                <th>People</th>
+                <th>Guide Fee</th>
+                <th>Base Price</th>
+                <th>Total Price</th>
+            </tr>
+            </thead>
+            <tbody id="bookingTableBody"></tbody>
+        </table>
+    </div>
+
+    <div id="guides" class="hidden">
+        <h1>Guide Management</h1>
+
+        <!-- Search & Add Guide Section -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <!-- Add Guide Button (Left) -->
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addGuideModal">
+                Add Guide
+            </button>
+
+            <!-- Search Box (Right) -->
+            <input type="text" id="searchGuide" class="form-control w-25" placeholder="Search Guides by Name or Email">
+        </div>
+
+        <!-- Guide Table -->
+        <table class="table table-bordered mt-3">
+            <thead class="table-dark">
+            <tr>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Image</th>
+                <th>Description</th>
+                <th>Payment per Day</th>
+                <th>Linkedin</th>
+                <th>Booked</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="guideTableBody">
+            <!-- Guides will be loaded here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add Guide Modal -->
+    <div class="modal fade" id="addGuideModal" tabindex="-1" aria-labelledby="addGuideModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addGuideModalLabel">Add Guide</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addGuideForm" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="guideName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="guideEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" id="guideDescription" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Payment per Day</label>
+                            <input type="number" class="form-control" id="guidePayment" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">LinkedIn URL</label>
+                            <input type="url" class="form-control" id="guideLinkedIn">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Upload Image</label>
+                            <input type="file" class="form-control" id="guideImage" accept="image/*" required>
+                            <img id="imagePreview" class="mt-2" style="width: 80px; height: 80px; display: none; border-radius: 5px;">
+                        </div>
+                        <button type="submit" class="btn btn-success">Save Guide</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Guide Modal -->
+    <div class="modal fade" id="editGuideModal" tabindex="-1" aria-labelledby="editGuideModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editGuideModalLabel">Edit Guide</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editGuideForm" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="editGuideName" name="editGuideName" >
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editGuideEmail" name="editGuideEmail" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" id="editGuideDescription" name="editGuideDescription" ></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Payment per Day</label>
+                            <input type="number" class="form-control" id="editGuidePayment" name="editGuidePayment" >
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">LinkedIn URL</label>
+                            <input type="url" class="form-control" id="editGuideLinkedIn" name="editGuideLinkedIn" >
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Upload Image</label>
+                            <input type="file" class="form-control" id="editGuideImage" name="editGuideImage" accept="image/*">
+                            <img id="editImagePreview" class="mt-2" style="width: 80px; height: 80px; display: none; border-radius: 5px;">
+                        </div>
+                        <button type="submit" class="btn btn-success">Update Guide</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="packages" class="hidden">
+        <h1>Package Management</h1>
+
+        <!-- Add Package Button -->
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPackageModal">
+            Add Package
+        </button>
+
+        <!-- Packages Table -->
+        <table class="table table-bordered mt-3">
+            <thead class="table-dark">
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Estimated Days</th>
+                <th>Price (LKR)</th>
+                <th>Destinations</th>
+                <th>Package image</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="packageTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Add Package Modal -->
+    <div class="modal fade" id="addPackageModal" tabindex="-1" aria-labelledby="addPackageModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="addPackageForm" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addPackageModalLabel">Add Package</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="packageName" class="form-label">Package Name</label>
+                            <input type="text" class="form-control" id="packageName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="packagePrice" class="form-label">Price (LKR)</label>
+                            <input type="number" class="form-control" id="packagePrice" name="price" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="packageDays" class="form-label">Estimated Days</label>
+                            <input type="number" class="form-control" id="packageDays" name="estimatedDays" min="1" max="20" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="packageDestinations" class="form-label">Select Destinations</label>
+                            <select multiple class="form-control" id="packageDestinations" name="destinations" required>
+                                <!-- Loaded dynamically -->
+                            </select>
+                            <small class="form-text text-muted">Hold Ctrl (Windows) or Cmd (Mac) to select multiple destinations.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="packageImage" class="form-label">Upload Package Image</label>
+                            <input type="file" class="form-control" id="packageImage" name="imageUrl" accept="image/*">
+                        </div>
+                        <div class="mb-3">
+                            <img id="PackageImgPreview" src="#" alt="Preview" style="width: 80px; height: 80px; display: none; border-radius: 5px;">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Create Package</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Package Modal -->
+    <div class="modal fade" id="editPackageModal" tabindex="-1" aria-labelledby="editPackageModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="editPackageForm" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editPackageModalLabel">Edit Package</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="editPackageId">
+                        <div class="mb-3">
+                            <label for="editPackageName" class="form-label">Package Name</label>
+                            <input type="text" class="form-control" id="editPackageName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPackagePrice" class="form-label">Price (LKR)</label>
+                            <input type="number" class="form-control" id="editPackagePrice" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPackageDays" class="form-label">Estimated Days</label>
+                            <input type="number" class="form-control" id="editPackageDays" min="1" max="20" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPackageDestinations" class="form-label">Select Destinations</label>
+                            <select multiple class="form-control" id="editPackageDestinations" required>
+                                <!-- Loaded dynamically -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPackageImage" class="form-label">Upload Package Image</label>
+                            <input type="file" class="form-control" id="editPackageImage" name="image" accept="image/*">
+                        </div>
+                        <div class="mb-3">
+                            <img id="editPackageImgPreview" src="#" alt="Preview" style="width: 100px; height: 100px; display: none; border-radius: 5px;">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="payments" class="hidden">
+        <h1>Payment Management</h1>
+
+        <input type="text" id="searchEmail" class="form-control mb-3" placeholder="Search by user email...">
+
+        <table class="table table-bordered mt-3">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>User Email</th>
+                <th>Amount</th>
+                <th>Date</th>
+            </tr>
+            </thead>
+            <tbody id="paymentTableBody"></tbody>
+        </table>
+
+        <script>
+            let allPayments = []; // Store all payments globally
+
+            function loadAllPayments() {
+                $.ajax({
+                    url: "http://localhost:8080/api/v1/payment/getAll",
+                    type: "GET",
+                    success: function (response) {
+                        allPayments = response.data; // Save for filtering
+                        renderPayments(allPayments); // Initial render
+                    },
+                    error: function () {
+                        alert("Failed to load payments.");
+                    }
+                });
+            }
+
+            function renderPayments(payments) {
+                const tbody = $("#paymentTableBody");
+                tbody.empty();
+
+                payments.forEach(payment => {
+                    const row = `
+            <tr>
+                <td>${payment.id}</td>
+                <td>${payment.userEmail}</td>
+                <td>LKR ${payment.amount.toFixed(2)}</td>
+                <td>${payment.paymentDate}</td>
+            </tr>
+        `;
+                    tbody.append(row);
+                });
+            }
+
+            // Live filter
+            $("#searchEmail").on("input", function () {
+                const query = $(this).val().toLowerCase();
+                const filtered = allPayments.filter(p => p.userEmail.toLowerCase().includes(query));
+                renderPayments(filtered);
+            });
+
+            // Load on page ready
+            $(document).ready(function () {
+                loadAllPayments();
+            });
+
+        </script>
+    </div>
+
+    <div id="destinations" class="hidden">
+        <h1>Destinations Management</h1>
+
+        <!-- Add Destination Button -->
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDestinationModal">
+            Add Destination
+        </button>
+
+        <!-- Destinations Table -->
+        <table class="table table-bordered mt-3">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Location</th>
+                <th>Category</th>
+                <th>Cost In day (RS.)</th>
+                <th>Image</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="destinationTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Add Destination Modal -->
+    <div class="modal fade" id="addDestinationModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Add Destination</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addDestinationForm" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="destinationName" class="form-label">Destination Name</label>
+                            <input type="text" class="form-control" id="destinationName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="destinationDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="destinationDescription" name="description" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="destinationLocation" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="destinationLocation" name="location" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="destinationCost" class="form-label">Cost in day </label>
+                            <input type="text" class="form-control" id="destinationCost" name="costPerDay" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="destinationCategory" class="form-label">Category</label>
+                            <select class="form-control" id="destinationCategory" name="category" required>
+                                <option value="beach">Beach</option>
+                                <option value="mountain">Mountain</option>
+                                <option value="forest">Forest</option>
+                                <option value="city">City</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="destinationImage" class="form-label">Upload Image</label>
+                            <input type="file" class="form-control" id="destinationImage" name="imageUrl" accept="image/*" required>
+                        </div>
+                        <!-- Image Preview -->
+                        <div class="mb-3">
+                            <img id="imgPreview" src="#" alt="Preview" style="width: 80px; height: 80px; display: none; border-radius: 5px;">
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Save Destination</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Destination Modal -->
+    <div class="modal fade" id="editDestinationModal" tabindex="-1" aria-labelledby="editModalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalTitle">Edit Destination</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editDestinationForm" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="editDestinationId" class="form-label">Id</label>
+                            <input type="number" class="form-control" id="editDestinationId" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDestinationName" class="form-label">Destination Name</label>
+                            <input type="text" class="form-control" id="editDestinationName" name="editDestinationName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDestinationDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="editDestinationDescription" name="editDestinationDescription" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDestinationLocation" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="editDestinationLocation" name="editDestinationLocation" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDestinationCategory" class="form-label">Category</label>
+                            <select class="form-control" id="editDestinationCategory" name="editDestinationCategory" required>
+                                <option value="beach">Beach</option>
+                                <option value="mountain">Mountain</option>
+                                <option value="forest">Forest</option>
+                                <option value="city">City</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDestinationCostPerDay" class="form-label">Cost Per Day</label>
+                            <input type="number" class="form-control" id="editDestinationCostPerDay" name="editDestinationCostPerDay" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDestinationImage" class="form-label">Upload Image</label>
+                            <input type="file" class="form-control" id="editDestinationImage" name="editDestinationImage" accept="image/*">
+                        </div>
+                        <!-- Image Preview -->
+                        <div class="mb-3">
+                            <img id="editImgPreview" src="#" alt="Preview" style="width: 100px; height: 100px; display: none; border-radius: 5px;">
+                        </div>
+                        <button type="submit" class="btn btn-success">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function showPanel(panelId) {
+        $('.content > div').addClass('hidden');
+        $('#' + panelId).removeClass('hidden');
+
+        // Load data dynamically when a panel is clicked
+        switch (panelId) {
+            case 'users': /*fetchUsers();*/ break;
+            case 'vehicles': /*fetchVehicles()*/; break;
+            case 'bookings': ; break;
+            case 'packages': ; break;
+            case 'payments': ; break;
+            case 'destinations': ; break;
+            case 'guides': ; break;
+            case 'settings': ; break;
+            // Add more cases if needed
+        }
+    }
+
+    $('#addUserForm').submit(function(event) {
+        event.preventDefault();
+        let name = $('#userName').val();
+        let email = $('#userEmail').val();
+
+        $.ajax({
+            url: '/api/users',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ name, email }),
+            success: function() {
+                $('#addUserModal').modal('hide');
+                fetchUsers();
+                $('#addUserForm')[0].reset();
+            }
+        });
+    });
+
+    $(document).ready(function() {
+        showPanel('dashboard'); // Show dashboard by default
+    });
+</script>
+<script>
+    function logout() {
+        localStorage.removeItem("name");
+        localStorage.removeItem("token");
+        localStorage.removeItem("email");
+        localStorage.removeItem("role");
+
+        // Optional: hide/show UI parts if needed
+        const userDropdown = document.getElementById("userDropdown");
+        const signInUpLink = document.getElementById("signInUpLink");
+
+        if (userDropdown) userDropdown.classList.add("d-none");
+        if (signInUpLink) signInUpLink.classList.remove("d-none");
+
+        // Redirect to home page
+        window.location.href = "index.html";
+    }
+</script>
+
+<script src="AdminScripts/admin-vehicle.js"></script>
+<script src="AdminScripts/admin-guide.js"></script>
+<script src="AdminScripts/admin-destination.js"></script>
+<script src="AdminScripts/admin-package.js"></script>
+<script src="AdminScripts/admin-bookings.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
