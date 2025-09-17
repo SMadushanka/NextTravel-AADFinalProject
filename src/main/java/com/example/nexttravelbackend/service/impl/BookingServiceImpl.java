@@ -52,7 +52,11 @@ public class BookingServiceImpl implements BookingService {
             Booking booking = new Booking();
             booking.setUser(user);
             booking.setGuide(guide);
-            booking.setVehicle(vehicle);
+
+            if (vehicle != null) {
+                booking.setVehicle(vehicle);
+            }
+
             booking.setTourPackage(tourPackage);
             booking.setEstimatedDays(dto.getEstimatedDays());
             booking.setBookingDate(LocalDate.parse(dto.getBookingDate()));
