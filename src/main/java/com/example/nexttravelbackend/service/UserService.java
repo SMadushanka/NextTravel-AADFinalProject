@@ -16,4 +16,4 @@ public interface UserService {
     List<UserDTO> getAllUsers();
 
     boolean deleteUserByEmail(String email);
-}
+}''
