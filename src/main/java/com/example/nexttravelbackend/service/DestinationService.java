@@ -13,3 +13,4 @@ public interface DestinationService {
 
     List<DestinationDTO> getAllDestinations();
 }
+''
