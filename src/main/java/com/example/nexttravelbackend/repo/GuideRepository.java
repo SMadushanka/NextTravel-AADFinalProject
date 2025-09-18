@@ -16,3 +16,4 @@ public interface GuideRepository extends JpaRepository<Guide, Long> {
 
     List<Guide> findAllByBookedAndStatus(String booked, String status);
 }
+''
