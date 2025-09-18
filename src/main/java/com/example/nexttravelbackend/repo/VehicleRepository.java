@@ -21,4 +21,3 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
     String findOwnerEmailByVehicleNumber(String vehicleNumber);
 }
-''
