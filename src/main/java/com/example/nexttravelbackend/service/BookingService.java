@@ -1,4 +1,4 @@
-'package com.example.nexttravelbackend.service;
+package com.example.nexttravelbackend.service;
 
 import com.example.nexttravelbackend.dto.BookingDTO;
 
@@ -18,4 +18,3 @@ public interface BookingService {
 
     List<Map<String, Object>> getTotalPricePerBooking();
 }
-'
