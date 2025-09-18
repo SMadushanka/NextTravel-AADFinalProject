@@ -12,3 +12,4 @@ public interface TourPackageRepository extends JpaRepository<TourPackage, Long> 
 
     Optional<TourPackage> findByName(String name);
 }
+''
