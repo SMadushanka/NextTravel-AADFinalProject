@@ -21,3 +21,4 @@ public interface GuideService {
 
     int getTotalGuideCount();
 }
+''
