@@ -12,3 +12,4 @@ public interface PaymentService {
     List<Map<String, Object>> getAllPayments();
 
 }
+''
