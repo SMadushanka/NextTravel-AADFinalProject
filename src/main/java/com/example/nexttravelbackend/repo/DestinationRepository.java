@@ -17,3 +17,4 @@ public interface DestinationRepository extends JpaRepository<Destination, String
     void deleteById(Long id);
 
 }
+''
