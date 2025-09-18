@@ -7,4 +7,3 @@ public interface EmailService {
 
     void sendBookingConfirmationEmails(BookingDTO dto);
 }
-''
