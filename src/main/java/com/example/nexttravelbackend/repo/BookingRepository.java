@@ -22,4 +22,3 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
     List<Map<String, Object>> findTotalPricePerBooking();
 
 }
-''
