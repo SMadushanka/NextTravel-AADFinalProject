@@ -45,3 +45,15 @@ Run the TravelEaseApplication class to start the server on http://localhost:8080
 Open the frontend folder.
 Open index.html or dashboard.html in your browser.
 Make sure the backend is running to fetch data.
+
+Demo Video
+🎬 Watch the full walkthrough here:https://youtu.be/HNmUERpcp0o?si=ozFBBNAW6WW6hKYM
+Spring Boot Project - IJSE - GDSE71 - Panadura - Chamith Dilhara - 2nd Semester Final Project
+
+📧 Contact
+Created by Sampath Madushanka
+📍 Ambalantota, Hambantota District, Sri Lanka
+📨 Email: wijamu.maduu22@gmail.com
+
+
+
