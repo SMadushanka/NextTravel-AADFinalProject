@@ -38,7 +38,7 @@ Other Tools: ModelMapper, JavaMailSender, REST APIs
 
 Open the backend folder in IntelliJ IDEA.
 Make sure MySQL is running and update application.properties with your DB credentials.
-Run the TravelEaseApplication class to start the server on http://localhost:8080.
+Run the NextTravelApplication class to start the server on http://localhost:8080.
 
 🌐 Frontend
 
@@ -48,12 +48,13 @@ Make sure the backend is running to fetch data.
 
 Demo Video
 🎬 Watch the full walkthrough here:https://youtu.be/HNmUERpcp0o?si=ozFBBNAW6WW6hKYM
-Spring Boot Project - IJSE - GDSE71 - Panadura - Chamith Dilhara - 2nd Semester Final Project
+Spring Boot Project - IJSE - GDSE71 - Panadura - Sampath Madushanka - 2nd Semester Final Project
 
 📧 Contact
 Created by Sampath Madushanka
 📍 Ambalantota, Hambantota District, Sri Lanka
 📨 Email: wijamu.maduu22@gmail.com
+
 
 
 
