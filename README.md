@@ -56,29 +56,34 @@ NextTravel simplifies travel planning for tourists by offering a seamless, end-t
 
 ---
 
+
 ## 📸 Screenshots
 
-### 🗝️ Login and Sign up Page
-![image]()
-![image]()
+### 🗝️ Login and Sign upPage
+<img width="1919" height="910" alt="Screenshot 2025-09-20 224001" src="https://github.com/user-attachments/assets/46478b95-5c9f-4555-b85e-c551d728f5e7" />
+<img width="1919" height="908" alt="Screenshot 2025-09-20 224025" src="https://github.com/user-attachments/assets/605e5c9a-5c7a-4870-ab59-acd0e213583e" />
+
+
 
 ### 🏠 Home Page
-![image]()
+<img width="1901" height="906" alt="Screenshot 2025-09-20 224127" src="https://github.com/user-attachments/assets/ec4c86d8-481a-4f9b-a033-ba5c7f260cb6" />
+
 
 ### 📅 Booking Form
-![image]()
+<img width="1877" height="906" alt="Screenshot 2025-09-20 230953" src="https://github.com/user-attachments/assets/59b61df3-7ddc-4be1-9f62-e4c5060b4d00" />
 
 
 ### 🧑‍💼 Admin Dashboard
-![image]()
+<img width="1898" height="902" alt="Screenshot 2025-09-20 224347" src="https://github.com/user-attachments/assets/a9714102-1024-4f9f-8a0b-dcea50e87efe" />
+
 
 ### 🧳 Tour Package View
-![image]()
-![image]()
+<img width="1897" height="903" alt="Screenshot 2025-09-20 224550" src="https://github.com/user-attachments/assets/378480dd-4797-4589-b657-c8609470e00a" />
 
 
 ### 📧 Guide Registration Confirmation Email
-![Screenshot 2025-04-19 070301]()
+<img width="1917" height="409" alt="Screenshot 2025-09-20 225219" src="https://github.com/user-attachments/assets/c1cf17ec-79fb-47e3-93e9-aa1b2ba56569" />
+
 
 ---
 
