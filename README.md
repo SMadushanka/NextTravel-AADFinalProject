@@ -59,26 +59,23 @@ NextTravel simplifies travel planning for tourists by offering a seamless, end-t
 ## 📸 Screenshots
 
 ### 🗝️ Login and Sign up Page
-![image]()
-![image]()
+![image](https://github.com/user-attachments/assets/46478b95-5c9f-4555-b85e-c551d728f5e7)
+![image](https://github.com/user-attachments/assets/605e5c9a-5c7a-4870-ab59-acd0e213583e)
 
 ### 🏠 Home Page
-![image]()
+![image](https://github.com/user-attachments/assets/ec4c86d8-481a-4f9b-a033-ba5c7f260cb6)
 
 ### 📅 Booking Form
-![image]()
-
+![image](https://github.com/user-attachments/assets/59b61df3-7ddc-4be1-9f62-e4c5060b4d00)
 
 ### 🧑‍💼 Admin Dashboard
-![image]()
+![image](https://github.com/user-attachments/assets/a9714102-1024-4f9f-8a0b-dcea50e87efe)
 
 ### 🧳 Tour Package View
-![image]()
-![image]()
-
+![image](https://github.com/user-attachments/assets/378480dd-4797-4589-b657-c8609470e00a)
 
 ### 📧 Guide Registration Confirmation Email
-![Screenshot 2025-04-19 070301]()
+![Screenshot 2025-09-19 070301](https://github.com/user-attachments/assets/c1cf17ec-79fb-47e3-93e9-aa1b2ba56569)
 
 ---
 
